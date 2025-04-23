@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Directorio de Proveedores de Servicios</title>
+  <title>MyService - Conectando Servicios</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
@@ -11,7 +11,6 @@
     body {
       font-family: 'Roboto', sans-serif;
     }
-    /* Hide the search section when booking is active */
     #searchSection.hidden {
       display: none;
     }
@@ -20,7 +19,7 @@
 <body class="bg-gray-50 min-h-screen flex flex-col">
   <header class="bg-white shadow p-4">
     <div class="container mx-auto flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-gray-800">Directorio de Servicios</h1>
+      <h1 class="text-2xl font-bold text-gray-800">MyService</h1>
       <div class="flex space-x-4">
         <a href="register.html" class="text-blue-600 hover:text-blue-800 font-semibold">Regístrate como proveedor</a>
         <a href="video-recording.html" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center">
@@ -33,7 +32,7 @@
 
   <main class="container mx-auto flex-grow p-4">
     <section class="max-w-xl mx-auto text-center mb-8">
-      <h1 class="text-3xl font-bold mb-4 text-gray-800">Bienvenido al Directorio de Servicios</h1>
+      <h1 class="text-3xl font-bold mb-4 text-gray-800">Bienvenido a MyService</h1>
       <p class="text-gray-600 mb-6">
         Encuentra proveedores de servicios confiables cerca de ti. Permite que la aplicación acceda a tu ubicación para mostrarte los servicios más cercanos.
       </p>
@@ -92,11 +91,11 @@
         <form id="loginForm" class="space-y-4">
           <div>
             <label for="loginUsername" class="block text-gray-700 font-semibold mb-1">Usuario</label>
-            <input type="text" id="loginUsername" name="username" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input type="text" id="loginUsername" name="username" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" autocomplete="username" />
           </div>
           <div>
             <label for="loginPassword" class="block text-gray-700 font-semibold mb-1">Contraseña</label>
-            <input type="password" id="loginPassword" name="password" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input type="password" id="loginPassword" name="password" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" autocomplete="current-password" />
           </div>
           <div class="flex justify-end space-x-4">
             <button type="button" id="loginCancel" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
@@ -109,7 +108,7 @@
   </main>
 
   <footer class="bg-white shadow p-4 text-center text-gray-600 text-sm">
-    &copy; 2024 Directorio de Servicios. Todos los derechos reservados.
+    &copy; 2024 MyService. Todos los derechos reservados.
   </footer>
 
   <script>
@@ -190,7 +189,6 @@
       step3.classList.add('hidden');
       bookingLocationInput.value = '';
       bookingStatus.textContent = '';
-      // Hide search section while booking
       document.getElementById('searchSection').classList.add('hidden');
     }
 
@@ -247,7 +245,6 @@
         }
         bookingStatus.textContent = 'Solicitud enviada con éxito. ¡Gracias!';
         bookingStatus.className = 'text-green-600';
-        // Reset booking steps and show search again
         bookingSection.classList.add('hidden');
         document.getElementById('searchSection').classList.remove('hidden');
         selectedProviderId = null;
@@ -302,11 +299,6 @@
       }
     });
 
-    // Load providers on page load
-    window.addEventListener('DOMContentLoaded', () => {
-      loadProvidersForSelect();
-    });
-
     // Search form submit handler
     searchForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -330,7 +322,6 @@
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         locateBtn.textContent = 'Ubicación obtenida';
-        // Perform search with location
         resultsDiv.innerHTML = '<p class="text-gray-600">Buscando proveedores cercanos...</p>';
         try {
           const response = await fetch(`/providers?lat=${lat}&lng=${lng}`);
