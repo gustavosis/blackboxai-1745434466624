@@ -143,18 +143,26 @@ router.get('/', (req, res) => {
   const lng = parseFloat(req.query.lng);
   const radius = parseFloat(req.query.radius) || 10;
 
-  let sql = "SELECT *, \
-    ( 6371 * acos( cos( radians(?) ) * cos( radians(latitude) ) * cos( radians(longitude) - radians(?) ) + sin( radians(?) ) * sin( radians(latitude) ) ) ) AS distance \
-    FROM providers WHERE active = 1";
-  let params = [lat, lng, lat];
+  let sql = "SELECT * FROM providers WHERE active = 1";
+  let params = [];
 
   if (search) {
     sql += " AND service LIKE ?";
     params.push("%" + search + "%");
   }
 
-  sql += " HAVING distance <= ? ORDER BY distance ASC";
-  params.push(radius);
+  // Add distance calculation only if coordinates are provided
+  if (!isNaN(lat) && !isNaN(lng)) {
+    sql = `SELECT *, 
+      (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * 
+      cos(radians(longitude) - radians(?)) + sin(radians(?)) * 
+      sin(radians(latitude)))) AS distance 
+      FROM (${sql})
+      WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+      HAVING distance <= ?
+      ORDER BY distance ASC`;
+    params = [lat, lng, lat, ...params, radius];
+  }
 
   db.all(sql, params, (err, rows) => {
     if (err) {
