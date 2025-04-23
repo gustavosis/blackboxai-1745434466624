@@ -1,7 +1,7 @@
 {
-  "name": "service-directory-app",
+  "name": "myservice",
   "version": "1.0.0",
-  "description": "Service Directory Application with Video Recording Feature",
+  "description": "MyService - A Modern Platform for Connecting Service Providers with Users",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
