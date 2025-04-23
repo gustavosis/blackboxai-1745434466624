@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Directorio de Proveedores de Servicios</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+    /* Hide the search section when booking is active */
+    #searchSection.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-gray-800">Directorio de Servicios</h1>
+      <div class="flex space-x-4">
+        <a href="register.html" class="text-blue-600 hover:text-blue-800 font-semibold">Regístrate como proveedor</a>
+        <a href="video-recording.html" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center">
+          <i class="fas fa-video mr-1"></i> Graba tu presentación
+        </a>
+        <button id="loginBtn" class="text-blue-600 hover:text-blue-800 font-semibold">Iniciar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto flex-grow p-4">
+    <section class="max-w-xl mx-auto text-center mb-8">
+      <h1 class="text-3xl font-bold mb-4 text-gray-800">Bienvenido al Directorio de Servicios</h1>
+      <p class="text-gray-600 mb-6">
+        Encuentra proveedores de servicios confiables cerca de ti. Permite que la aplicación acceda a tu ubicación para mostrarte los servicios más cercanos.
+      </p>
+      <button id="locateBtn" class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition font-semibold">
+        Usar mi ubicación
+      </button>
+    </section>
+
+    <section id="searchSection" class="max-w-xl mx-auto">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">Busca un servicio</h2>
+      <form id="searchForm" class="flex mb-6">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Ejemplo: carpintería, mecánica, plomería..."
+          class="flex-grow border border-gray-300 rounded-l px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+          required
+        />
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-8 rounded-r hover:bg-blue-700 transition"
+          aria-label="Buscar servicios"
+        >
+          <i class="fas fa-search text-xl"></i>
+        </button>
+      </form>
+
+      <div id="results" class="space-y-4"></div>
+    </section>
+
+    <section id="bookingSection" class="max-w-xl mx-auto mt-8 bg-white p-6 rounded shadow hidden">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">Reserva tu servicio en 3 pasos</h2>
+      <div id="bookingSteps" class="space-y-6">
+        <div id="step1" class="step">
+          <h3 class="text-lg font-semibold mb-2">Paso 1: Confirmar proveedor</h3>
+          <p id="selectedProviderName" class="mb-4 text-gray-800 font-semibold"></p>
+        </div>
+        <div id="step2" class="step hidden">
+          <h3 class="text-lg font-semibold mb-2">Paso 2: Confirma tu ubicación</h3>
+          <input type="text" id="bookingLocation" placeholder="Ciudad, barrio, etc." class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <button id="useCurrentLocation" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition font-semibold">Usar mi ubicación actual</button>
+        </div>
+        <div id="step3" class="step hidden">
+          <h3 class="text-lg font-semibold mb-2">Paso 3: Confirma y reserva</h3>
+          <p id="summary" class="mb-4 text-gray-700"></p>
+          <button id="confirmBooking" class="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition font-semibold">Confirmar Reserva</button>
+          <p id="bookingStatus" class="mt-4 text-center text-sm"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+      <div class="bg-white rounded p-6 w-full max-w-md">
+        <h2 class="text-xl font-semibold mb-4">Iniciar sesión</h2>
+        <form id="loginForm" class="space-y-4">
+          <div>
+            <label for="loginUsername" class="block text-gray-700 font-semibold mb-1">Usuario</label>
+            <input type="text" id="loginUsername" name="username" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label for="loginPassword" class="block text-gray-700 font-semibold mb-1">Contraseña</label>
+            <input type="password" id="loginPassword" name="password" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div class="flex justify-end space-x-4">
+            <button type="button" id="loginCancel" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancelar</button>
+            <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Entrar</button>
+          </div>
+        </form>
+        <p id="loginMessage" class="mt-2 text-sm text-red-600"></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-white shadow p-4 text-center text-gray-600 text-sm">
+    &copy; 2024 Directorio de Servicios. Todos los derechos reservados.
+  </footer>
+
+  <script>
+    // Elements
+    const resultsDiv = document.getElementById('results');
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const bookingSection = document.getElementById('bookingSection');
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const selectedProviderName = document.getElementById('selectedProviderName');
+    const bookingLocationInput = document.getElementById('bookingLocation');
+    const summary = document.getElementById('summary');
+    const bookingStatus = document.getElementById('bookingStatus');
+    const useCurrentLocationBtn = document.getElementById('useCurrentLocation');
+    const confirmBookingBtn = document.getElementById('confirmBooking');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginModal = document.getElementById('loginModal');
+    const loginForm = document.getElementById('loginForm');
+    const loginCancel = document.getElementById('loginCancel');
+    const loginMessage = document.getElementById('loginMessage');
+
+    let selectedProviderId = null;
+    let selectedProviderDisplayName = '';
+
+    // Fetch providers by search term
+    async function fetchProviders(searchTerm) {
+      try {
+        const response = await fetch('/providers?search=' + encodeURIComponent(searchTerm));
+        if (!response.ok) {
+          throw new Error('Error al buscar proveedores');
+        }
+        const providers = await response.json();
+        return providers;
+      } catch (error) {
+        console.error(error);
+        return [];
+      }
+    }
+
+    // Render providers in results div
+    function renderProviders(providers) {
+      if (providers.length === 0) {
+        resultsDiv.innerHTML = '<p class="text-gray-600">No se encontraron proveedores para ese servicio.</p>';
+        return;
+      }
+      resultsDiv.innerHTML = providers.map(p => {
+        return '<div class="bg-white p-4 rounded shadow hover:shadow-lg transition cursor-pointer" data-id="' + p.id + '" data-name="' + p.name + '">' +
+          '<h3 class="text-lg font-semibold text-gray-800">' + p.name + '</h3>' +
+          '<p class="text-sm text-gray-600 italic">Servicio: ' + p.service + '</p>' +
+          '<p class="mt-2 text-gray-700">' + (p.description || 'Sin descripción') + '</p>' +
+          '<p class="mt-2 text-blue-600 font-semibold">Contacto: ' + p.contact + '</p>' +
+          '<p class="text-gray-500 text-sm">Ubicación: ' + (p.location || 'No especificada') + '</p>' +
+          '</div>';
+      }).join('');
+      attachProviderClickEvents();
+    }
+
+    // Attach click events to provider divs for booking
+    function attachProviderClickEvents() {
+      const providerDivs = document.querySelectorAll('#results > div');
+      providerDivs.forEach(div => {
+        div.addEventListener('click', () => {
+          selectedProviderId = div.getAttribute('data-id');
+          selectedProviderDisplayName = div.getAttribute('data-name');
+          startBooking();
+        });
+      });
+    }
+
+    // Start booking flow
+    function startBooking() {
+      selectedProviderName.textContent = selectedProviderDisplayName;
+      bookingSection.classList.remove('hidden');
+      step1.classList.remove('hidden');
+      step2.classList.add('hidden');
+      step3.classList.add('hidden');
+      bookingLocationInput.value = '';
+      bookingStatus.textContent = '';
+      // Hide search section while booking
+      document.getElementById('searchSection').classList.add('hidden');
+    }
+
+    // Use current location button handler
+    useCurrentLocationBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!navigator.geolocation) {
+        alert('Geolocalización no es soportada por tu navegador.');
+        return;
+      }
+      bookingStatus.textContent = 'Obteniendo ubicación...';
+      navigator.geolocation.getCurrentPosition((position) => {
+        bookingLocationInput.value = `Lat: ${position.coords.latitude.toFixed(5)}, Lng: ${position.coords.longitude.toFixed(5)}`;
+        bookingStatus.textContent = 'Ubicación obtenida.';
+      }, (error) => {
+        alert('No se pudo obtener la ubicación: ' + error.message);
+        bookingStatus.textContent = '';
+      });
+    });
+
+    // Clear booking status on location input change
+    bookingLocationInput.addEventListener('input', () => {
+      bookingStatus.textContent = '';
+    });
+
+    // Confirm booking button handler
+    confirmBookingBtn.addEventListener('click', async () => {
+      const location = bookingLocationInput.value.trim();
+      if (!location) {
+        bookingStatus.textContent = 'Por favor, ingresa tu ubicación.';
+        bookingStatus.className = 'text-red-600';
+        return;
+      }
+      step1.classList.add('hidden');
+      step2.classList.remove('hidden');
+      step3.classList.remove('hidden');
+      summary.textContent = `Has seleccionado al proveedor: ${selectedProviderDisplayName} y la ubicación: ${location}.`;
+      bookingStatus.textContent = '';
+
+      bookingStatus.textContent = 'Enviando solicitud...';
+      bookingStatus.className = '';
+      try {
+        const response = await fetch('/service_requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: null,
+            provider_id: selectedProviderId,
+            location: location,
+          }),
+        });
+        if (!response.ok) {
+          throw new Error('Error al enviar la solicitud');
+        }
+        bookingStatus.textContent = 'Solicitud enviada con éxito. ¡Gracias!';
+        bookingStatus.className = 'text-green-600';
+        // Reset booking steps and show search again
+        bookingSection.classList.add('hidden');
+        document.getElementById('searchSection').classList.remove('hidden');
+        selectedProviderId = null;
+        selectedProviderDisplayName = '';
+        bookingLocationInput.value = '';
+      } catch (error) {
+        console.error(error);
+        bookingStatus.textContent = 'Hubo un problema al enviar la solicitud.';
+        bookingStatus.className = 'text-red-600';
+      }
+    });
+
+    // Login modal toggle
+    loginBtn.addEventListener('click', () => {
+      loginModal.classList.remove('hidden');
+      loginMessage.textContent = '';
+      loginForm.reset();
+    });
+
+    loginCancel.addEventListener('click', () => {
+      loginModal.classList.add('hidden');
+    });
+
+    // Login form submit handler
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginMessage.textContent = '';
+      const username = loginForm.username.value.trim();
+      const password = loginForm.password.value.trim();
+      if (!username || !password) {
+        loginMessage.textContent = 'Por favor, ingresa usuario y contraseña.';
+        return;
+      }
+      try {
+        const response = await fetch('/users/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+        if (!response.ok) {
+          throw new Error('Credenciales inválidas');
+        }
+        const data = await response.json();
+        loginMessage.textContent = 'Inicio de sesión exitoso. Bienvenido, ' + data.user.username;
+        loginMessage.className = 'text-green-600';
+        setTimeout(() => {
+          loginModal.classList.add('hidden');
+        }, 1500);
+      } catch (error) {
+        loginMessage.textContent = error.message || 'Error al iniciar sesión';
+        loginMessage.className = 'text-red-600';
+      }
+    });
+
+    // Load providers on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadProvidersForSelect();
+    });
+
+    // Search form submit handler
+    searchForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const searchTerm = searchInput.value.trim();
+      if (!searchTerm) return;
+      resultsDiv.innerHTML = '<p class="text-gray-600">Buscando...</p>';
+      const providers = await fetchProviders(searchTerm);
+      renderProviders(providers);
+    });
+
+    // Geolocation and location-based search
+    const locateBtn = document.getElementById('locateBtn');
+    locateBtn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        alert('Geolocalización no es soportada por tu navegador.');
+        return;
+      }
+      locateBtn.disabled = true;
+      locateBtn.textContent = 'Obteniendo ubicación...';
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        locateBtn.textContent = 'Ubicación obtenida';
+        // Perform search with location
+        resultsDiv.innerHTML = '<p class="text-gray-600">Buscando proveedores cercanos...</p>';
+        try {
+          const response = await fetch(`/providers?lat=${lat}&lng=${lng}`);
+          if (!response.ok) throw new Error('Error al buscar proveedores');
+          const providers = await response.json();
+          renderProviders(providers);
+        } catch (error) {
+          console.error(error);
+          resultsDiv.innerHTML = '<p class="text-red-600">Error al buscar proveedores cercanos.</p>';
+        }
+      }, (error) => {
+        alert('No se pudo obtener la ubicación: ' + error.message);
+        locateBtn.disabled = false;
+        locateBtn.textContent = 'Usar mi ubicación';
+      });
+    });
+  </script>
+</body>
+</html>
